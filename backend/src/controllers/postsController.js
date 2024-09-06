@@ -173,3 +173,35 @@ export const excluirPostagem = async (req, res) => {
     res.status(500).json({ error: "Erro ao excluir a postagem" });
   }
 };
+
+export const uploadImagemPostagem = async (req, res) => {
+  try {
+    const { id } = idSchema.parse(req.params);
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Imagem não enviada" });
+    }
+
+    const postagem = await Post.findByPk(id);
+
+    if (!postagem) {
+      return res.status(404).json({ error: "Postagem não encontrada" });
+    }
+
+    postagem.imagem = `/uploads/images/${req.file.filename}`;
+    await postagem.save();
+
+    res.status(200).json({ message: "Imagem enviada com sucesso", imagem: postagem.imagem });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        errors: error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ error: "Erro ao enviar a imagem" });
+  }
+};
