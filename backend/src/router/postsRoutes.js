@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { create, listarPostagens, buscarPostagemPorId, atualizarPostagem, excluirPostagem, uploadImagemPostagem } from "../controllers/postsController.js";
-import upload from "../../Middlewares/uploadMiddleware.js";
+import upload from "../Middlewares/uploadMiddleware.js";
 
 const router = Router();
 
