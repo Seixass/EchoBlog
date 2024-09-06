@@ -77,3 +77,28 @@ export const listarPostagens = async (req, res) => {
     res.status(500).json({ error: "Erro ao listar postagens" });
   }
 };
+
+export const buscarPostagemPorId = async (req, res) => {
+  try {
+    const { id } = idSchema.parse(req.params);
+
+    const postagem = await Post.findByPk(id);
+
+    if (!postagem) {
+      return res.status(404).json({ error: "Postagem não encontrada" });
+    }
+
+    res.status(200).json(postagem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        errors: error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar a postagem" });
+  }
+};
