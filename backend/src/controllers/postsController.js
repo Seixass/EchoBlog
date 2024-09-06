@@ -19,28 +19,18 @@ const createSchema = z.object({
 });
 
 export const create = async (req, res) => {
-  //implementando a validação com zod
-  const bodyValidation = createSchema.safeParse(req.body);
-  if (!bodyValidation.success) {
-    return res.status(400).json({
-      msg: "Os dados recebidos do corpo da requisição são inválidos",
-      detalhes: formatZodError(bodyValidation.error),
-    });
-  }
-
-  const { titulo, conteudo, autor } = req.body;
-
-  const novoPost = {
-    titulo,
-    conteudo,
-    autor,
-  };
-
   try {
-    await Post.create(novoPost);
-    res.status(201).json({ msg: "Post Enviado" });
+    const { titulo, conteudo, autor, imagem } = req.body;
+    const newPost = await Post.create({
+      titulo,
+      conteudo,
+      dataPublicacao: new Date(),
+      autor,
+      imagem
+    });
+    res.status(201).json(newPost);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Erro ao enviar o post" });
+    res.status(500).json({ error: "Erro ao criar o post" });
   }
 };
