@@ -18,6 +18,18 @@ const createSchema = z.object({
     .min(5, { msg: "O conteudo deve ter pelo menos 5 caracteres" }),
 });
 
+const updateSchema = z.object({
+  titulo: z
+    .string()
+    .min(3, { message: "O título deve ter pelo menos 3 caracteres" })
+    .optional(),
+  conteudo: z
+    .string()
+    .min(5, { message: "O conteúdo deve ter pelo menos 5 caracteres" })
+    .optional(),
+  imagem: z.string().url({ message: "A URL da imagem deve ser válida" }).optional(),
+});
+
 export const create = async (req, res) => {
   try {
     const { titulo, conteudo, autor } = createSchema.parse(req.body);
@@ -45,7 +57,6 @@ export const create = async (req, res) => {
     res.status(500).json({ error: "Erro ao criar o post" });
   }
 };
-
 
 export const listarPostagens = async (req, res) => {
   try {
@@ -100,5 +111,38 @@ export const buscarPostagemPorId = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao buscar a postagem" });
+  }
+};
+
+export const atualizarPostagem = async (req, res) => {
+  try {
+    const { id } = idSchema.parse(req.params);
+
+    const { titulo, conteudo, imagem } = updateSchema.parse(req.body);
+
+    const postagem = await Post.findByPk(id);
+
+    if (!postagem) {
+      return res.status(404).json({ error: "Postagem não encontrada" });
+    }
+
+    postagem.titulo = titulo || postagem.titulo;
+    postagem.conteudo = conteudo || postagem.conteudo;
+    postagem.imagem = imagem || postagem.imagem;
+
+    await postagem.save();
+
+    res.status(200).json(postagem);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        errors: error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ error: "Erro ao atualizar a postagem" });
   }
 };
