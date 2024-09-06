@@ -55,8 +55,7 @@ export const create = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao criar o post" });
-  }
-};
+}};
 
 export const listarPostagens = async (req, res) => {
   try {
@@ -86,8 +85,7 @@ export const listarPostagens = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erro ao listar postagens" });
-  }
-};
+}};
 
 export const buscarPostagemPorId = async (req, res) => {
   try {
@@ -111,8 +109,7 @@ export const buscarPostagemPorId = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao buscar a postagem" });
-  }
-};
+}};
 
 export const atualizarPostagem = async (req, res) => {
   try {
@@ -144,8 +141,7 @@ export const atualizarPostagem = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao atualizar a postagem" });
-  }
-};
+}};
 
 export const excluirPostagem = async (req, res) => {
   try {
@@ -171,8 +167,7 @@ export const excluirPostagem = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao excluir a postagem" });
-  }
-};
+}};
 
 export const uploadImagemPostagem = async (req, res) => {
   try {
@@ -203,5 +198,4 @@ export const uploadImagemPostagem = async (req, res) => {
     }
     console.error(error);
     res.status(500).json({ error: "Erro ao enviar a imagem" });
-  }
-};
+}};
