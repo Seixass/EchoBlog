@@ -1,10 +1,10 @@
 import Post from "../models/postsModel.js";
 import { z } from "zod";
 
+//validação zod
 const idSchema = z.object({
   id: z.string().uuid("ID inválido. Deve ser um UUID válido."),
 });
-
 const createSchema = z.object({
   titulo: z
     .string()
@@ -17,7 +17,6 @@ const createSchema = z.object({
     .string()
     .min(5, { msg: "O conteudo deve ter pelo menos 5 caracteres" }),
 });
-
 const updateSchema = z.object({
   titulo: z
     .string()
