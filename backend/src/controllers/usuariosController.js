@@ -108,3 +108,22 @@ export const atualizarPerfilUsuario = async (req, res) => {
       res.status(400).json({ error: error.message });
     }
   };
+
+  export const listarUsuarios = async (req, res) => {
+    try {
+      const { nome, email, papel } = req.query; 
+  
+      const where = {};
+      if (nome) where.nome = nome;
+      if (email) where.email = email;
+      if (papel) where.papel = papel;
+  
+      
+      const usuarios = await Usuario.findAll({ where });
+  
+      res.status(200).json({ msg: "Lista de usuários", usuarios });
+    } catch (error) {
+      res.status(500).json({ msg: "Erro ao listar usuários", error: error.message });
+    }
+  };
+  
