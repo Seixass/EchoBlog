@@ -24,7 +24,7 @@ const updateUserSchema = z.object({
     nome: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }).optional(),
     email: z.string().email({ message: "Email inválido" }).optional(),
     senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }).optional(),
-  });
+});
 
 export const registrarUsuario = async (req, res) => {
   try {
@@ -107,9 +107,9 @@ export const atualizarPerfilUsuario = async (req, res) => {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  };
+};
 
-  export const listarUsuarios = async (req, res) => {
+export const listarUsuarios = async (req, res) => {
     try {
       const { nome, email, papel } = req.query; 
   
@@ -125,5 +125,21 @@ export const atualizarPerfilUsuario = async (req, res) => {
     } catch (error) {
       res.status(500).json({ msg: "Erro ao listar usuários", error: error.message });
     }
-  };
-  
+};
+
+export const excluirUsuario = async (req, res) => {
+try {
+    const { id } = req.params;
+
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+    return res.status(404).json({ msg: "Usuário não encontrado" });
+    }
+
+    await usuario.destroy();
+    res.status(200).json({ msg: "Usuário excluído com sucesso" });
+} catch (error) {
+    res.status(500).json({ msg: "Erro ao excluir usuário", error: error.message });
+}
+};
