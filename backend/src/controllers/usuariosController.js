@@ -25,6 +25,9 @@ const updateUserSchema = z.object({
     email: z.string().email({ message: "Email inválido" }).optional(),
     senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }).optional(),
 });
+const papelSchema = z.object({
+    papel: z.enum(["administrador", "autor", "leitor"], { message: "Papel inválido" }),
+});
 
 export const registrarUsuario = async (req, res) => {
   try {
@@ -143,3 +146,24 @@ try {
     res.status(500).json({ msg: "Erro ao excluir usuário", error: error.message });
 }
 };
+
+export const alterarPapelUsuario = async (req, res) => {
+    try {
+    const { id } = req.params;
+    const { papel } = papelSchema.parse(req.body);
+
+    const usuario = await Usuario.findByPk(id);
+
+    if (!usuario) {
+        return res.status(404).json({ msg: "Usuário não encontrado" });
+    }
+
+    usuario.papel = papel;
+    await usuario.save();
+
+    res.status(200).json({ msg: "Papel do usuário alterado com sucesso", usuario });
+    } catch (error) {
+    res.status(400).json({ msg: "Erro ao alterar papel", error: error.message });
+    }
+};
+
