@@ -29,4 +29,6 @@ export const Usuario = conn.define("usuarios", {
     values: ["administrador", "autor", "leitor"],
     defaultValue: "leitor",
   },
-});
+    tableName: "usuarios",
+}
+);
