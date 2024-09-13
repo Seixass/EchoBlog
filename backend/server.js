@@ -3,6 +3,10 @@ import express from "express";
 import cors from "cors";
 import conn from "./src/config/conn.js";
 
+import './src/models/usuariosModel.js';
+import './src/models/postsModel.js';
+import './src/models/associations/associations.js';
+
 //importação das rotas
 import postsRouter from "./src/router/postsRoutes.js";
 import usuariosRouter from "./src/router/usuariosRoutes.js"

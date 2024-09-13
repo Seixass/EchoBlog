@@ -3,30 +3,24 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
 
-//validação zod
+// Validações Zod
 const createUserSchema = z.object({
-  nome: z
-    .string()
-    .min(3, { message: "O nome deve ter pelo menos 3 caracteres" }),
+  nome: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }),
   email: z.string().email({ message: "Email inválido" }),
-  senha: z
-    .string()
-    .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
+  senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
   papel: z.enum(["administrador", "autor", "leitor"]).optional(),
 });
 const loginSchema = z.object({
   email: z.string().email({ message: "Email inválido" }),
-  senha: z
-    .string()
-    .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
+  senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
 });
 const updateUserSchema = z.object({
-    nome: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }).optional(),
-    email: z.string().email({ message: "Email inválido" }).optional(),
-    senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }).optional(),
+  nome: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }).optional(),
+  email: z.string().email({ message: "Email inválido" }).optional(),
+  senha: z.string().min(8, { message: "A senha deve ter pelo menos 8 caracteres" }).optional(),
 });
 const papelSchema = z.object({
-    papel: z.enum(["administrador", "autor", "leitor"], { message: "Papel inválido" }),
+  papel: z.enum(["administrador", "autor", "leitor"], { message: "Papel inválido" }),
 });
 
 export const registrarUsuario = async (req, res) => {
@@ -43,9 +37,7 @@ export const registrarUsuario = async (req, res) => {
       papel: definirPapel,
     });
 
-    res
-      .status(201)
-      .json({ msg: "Usuário registrado com sucesso", usuario: novoUsuario });
+    res.status(201).json({ msg: "Usuário registrado com sucesso", usuario: novoUsuario });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -60,110 +52,86 @@ export const loginUsuario = async (req, res) => {
       return res.status(404).json({ msg: "Usuário não encontrado" });
     }
 
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida) {
-      return res.status(401).json({ msg: "Senha inválida" });
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaCorreta) {
+      return res.status(401).json({ msg: "Senha incorreta" });
     }
 
-    const token = jwt.sign(
-      { id: usuario.id, papel: usuario.papel },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = jwt.sign({ id: usuario.id, papel: usuario.papel }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    res.json({ msg: "Login realizado com sucesso", token });
+    res.status(200).json({ msg: "Login bem-sucedido", token });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
-export const atualizarPerfilUsuario = async (req, res) => {
-    try {
-      const { nome, email, senha } = updateUserSchema.parse(req.body);
-  
-      const { id } = req.params;
-  
-      const usuario = await Usuario.findByPk(id);
-      if (!usuario) {
-        return res.status(404).json({ msg: "Usuário não encontrado" });
-      }
-  
-      if (nome) usuario.nome = nome;
-      if (email) {
-        const usuarioExistente = await Usuario.findOne({ where: { email } });
-        if (usuarioExistente && usuarioExistente.id !== usuario.id) {
-          return res.status(400).json({ msg: "O email já está em uso" });
-        }
-        usuario.email = email;
-      }
-  
-      if (senha) {
-        const hashedSenha = await bcrypt.hash(senha, 10);
-        usuario.senha = hashedSenha;
-      }
-  
-      await usuario.save();
-  
-      res.status(200).json({ msg: "Perfil atualizado com sucesso", usuario });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-};
+export const atualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome, email, senha } = updateUserSchema.parse(req.body);
 
-export const listarUsuarios = async (req, res) => {
-    try {
-      const { nome, email, papel } = req.query; 
-  
-      const where = {};
-      if (nome) where.nome = nome;
-      if (email) where.email = email;
-      if (papel) where.papel = papel;
-  
-      
-      const usuarios = await Usuario.findAll({ where });
-  
-      res.status(200).json({ msg: "Lista de usuários", usuarios });
-    } catch (error) {
-      res.status(500).json({ msg: "Erro ao listar usuários", error: error.message });
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) {
+      return res.status(404).json({ msg: "Usuário não encontrado" });
     }
+
+    usuario.nome = nome || usuario.nome;
+    usuario.email = email || usuario.email;
+
+    if (senha) {
+      usuario.senha = await bcrypt.hash(senha, 10);
+    }
+
+    await usuario.save();
+
+    res.status(200).json({ msg: "Usuário atualizado com sucesso", usuario });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
 
 export const excluirUsuario = async (req, res) => {
-try {
+  try {
     const { id } = req.params;
 
     const usuario = await Usuario.findByPk(id);
-
     if (!usuario) {
-    return res.status(404).json({ msg: "Usuário não encontrado" });
+      return res.status(404).json({ msg: "Usuário não encontrado" });
     }
 
     await usuario.destroy();
+
     res.status(200).json({ msg: "Usuário excluído com sucesso" });
-} catch (error) {
-    res.status(500).json({ msg: "Erro ao excluir usuário", error: error.message });
-}
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao excluir usuário", details: error.message });
+  }
 };
 
-export const alterarPapelUsuario = async (req, res) => {
-    try {
-    const { id } = req.params;
-    const { papel } = papelSchema.parse(req.body);
+export const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll();
+
+    res.status(200).json(usuarios);
+  } catch (error) {
+    res.status(500).json({ msg: "Erro ao listar usuários", error: error.message });
+  }
+};
+
+export const atualizarPapelUsuario = async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const { papel } = papelSchema.parse(req.body); 
 
     const usuario = await Usuario.findByPk(id);
-
     if (!usuario) {
-        return res.status(404).json({ msg: "Usuário não encontrado" });
+      return res.status(404).json({ msg: "Usuário não encontrado" });
     }
 
     usuario.papel = papel;
     await usuario.save();
 
-    res.status(200).json({ msg: "Papel do usuário alterado com sucesso", usuario });
-    } catch (error) {
-    res.status(400).json({ msg: "Erro ao alterar papel", error: error.message });
-    }
+    res.status(200).json({ msg: "Papel do usuário atualizado com sucesso", usuario });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };
-

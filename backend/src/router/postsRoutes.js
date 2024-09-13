@@ -1,15 +1,17 @@
 import { Router } from "express";
-import { create, listarPostagens, buscarPostagemPorId, atualizarPostagem, excluirPostagem, uploadImagemPostagem } from "../controllers/postsController.js";
+import { criarPostagem, listarPostagens, buscarPostagemPorId, atualizarPostagem, excluirPostagem, uploadImagemPostagem, listarPostagensPorAutor } from "../controllers/postsController.js";
 import upload from "../Middlewares/uploadMiddleware.js";
+import { verificarToken } from "../Middlewares/authAdmin .js";
 
 const router = Router();
 
 
-router.post("/", create);
+router.post("/registro", criarPostagem);
 router.get("/", listarPostagens);
 router.get("/:id", buscarPostagemPorId);
-router.put("/:id", atualizarPostagem);
-router.delete("/:id", excluirPostagem);
-router.post("/:id/imagem", upload.single("imagem"), uploadImagemPostagem);
+router.put("/:id", verificarToken, atualizarPostagem);
+router.delete("/:id", verificarToken, excluirPostagem);
+router.post("/:id/imagem", verificarToken, upload.single("imagem"), uploadImagemPostagem);
+router.get("/autor", verificarToken, listarPostagensPorAutor);
 
 export default router;
