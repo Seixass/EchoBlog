@@ -18,14 +18,16 @@ const Post = conn.define("posts", {
   usuarioId: {
     type: DataTypes.UUID,
     references: {
-      model: 'usuarios',
-      key: 'id',
+      model: "usuarios",
+      key: "id",
     },
   },
   imagem: {
     type: DataTypes.STRING,
-    defaultValue: null
+    defaultValue: null,
   }
+}, {
+  tableName: "posts", 
 });
 
-export default Post
+export default Post;

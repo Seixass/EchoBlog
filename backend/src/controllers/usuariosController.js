@@ -23,6 +23,7 @@ const papelSchema = z.object({
   papel: z.enum(["administrador", "autor", "leitor"], { message: "Papel inválido" }),
 });
 
+
 export const registrarUsuario = async (req, res) => {
   try {
     const { nome, email, senha, papel } = createUserSchema.parse(req.body);
@@ -39,6 +40,7 @@ export const registrarUsuario = async (req, res) => {
 
     res.status(201).json({ msg: "Usuário registrado com sucesso", usuario: novoUsuario });
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error: error.message });
   }
 };
@@ -110,10 +112,9 @@ export const excluirUsuario = async (req, res) => {
 export const listarUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll();
-
     res.status(200).json(usuarios);
   } catch (error) {
-    res.status(500).json({ msg: "Erro ao listar usuários", error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

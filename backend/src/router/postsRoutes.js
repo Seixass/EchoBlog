@@ -1,10 +1,17 @@
-import { Router } from "express";
-import { criarPostagem, listarPostagens, buscarPostagemPorId, atualizarPostagem, excluirPostagem, uploadImagemPostagem, listarPostagensPorAutor } from "../controllers/postsController.js";
+import express from "express";
+import { 
+  criarPostagem,
+  listarPostagens,
+  buscarPostagemPorId,
+  atualizarPostagem,
+  excluirPostagem,
+  uploadImagemPostagem,
+  listarPostagensPorAutor 
+} from "../controllers/postsController.js";
 import upload from "../Middlewares/uploadMiddleware.js";
-import { verificarToken } from "../Middlewares/authAdmin .js";
+import { verificarToken } from "../Middlewares/verificarToken.js";
 
-const router = Router();
-
+const router = express.Router();
 
 router.post("/registro", criarPostagem);
 router.get("/", listarPostagens);
