@@ -15,7 +15,7 @@ export const Usuario = conn.define("usuarios", {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
-      isEmail: true 
+      isEmail: true
     },
     unique: true
   },
@@ -24,11 +24,12 @@ export const Usuario = conn.define("usuarios", {
     allowNull: false,
   },
   papel: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM("administrador", "autor", "leitor"),  
     allowNull: false,
-    values: ["administrador", "autor", "leitor"],
     defaultValue: "leitor",
   }
 }, {
-  tableName: "usuarios", 
+  tableName: "usuarios",
 });
+
+export default Usuario;

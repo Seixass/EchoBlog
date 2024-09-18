@@ -1,15 +1,13 @@
 import { DataTypes } from "sequelize";
 import conn from "../config/conn.js";
+import Post from "./postsModel.js";
+import { Usuario } from "./usuariosModel.js";
 
-const Post = conn.define("posts", {
+const Comentario = conn.define("comentarios", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
-  },
-  titulo: {
-    type: DataTypes.STRING,
-    allowNull: false,
   },
   conteudo: {
     type: DataTypes.TEXT,
@@ -22,12 +20,15 @@ const Post = conn.define("posts", {
       key: "id",
     },
   },
-  imagem: {
-    type: DataTypes.STRING,
-    defaultValue: null,
-  }
+  postagemId: {
+    type: DataTypes.UUID,
+    references: {
+      model: "posts",
+      key: "id",
+    },
+  },
 }, {
-  tableName: "posts", 
+  tableName: "comentarios",
 });
 
-export default Post;
+export default Comentario;
